@@ -21,7 +21,7 @@ namespace Aqueduct.Toggles.Sitecore.EventHandlers
                 {
                     database = Database.GetDatabase(remoteEventArgs.TargetDatabaseName);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                 }
                 //Hardcoded to Web
@@ -31,7 +31,7 @@ namespace Aqueduct.Toggles.Sitecore.EventHandlers
                     {
                         database = Database.GetDatabase("web");
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                     }
                 }

@@ -86,7 +86,7 @@ namespace Aqueduct.Toggles.Sitecore.Overrides
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //handler execption..
                 //Write to default sitecore logger.
