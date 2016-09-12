@@ -32,13 +32,13 @@ namespace Aqueduct.Toggles.Sitecore
             {
                 //resolve all the renderings from the featuretoggle
                 var layoutReplacement = SitecoreFeatureToggles.GetLayoutReplacement(itemId, templateId, currentLanguage);
-                var layoutRendering = renderingBuilder.GetRenederingById(layoutReplacement.LayoutId);
+                var layoutRendering = renderingBuilder.GetRenderingById(layoutReplacement.LayoutId);
                 layoutRendering.RenderingType = "Layout";
                 pageDefinition.Renderings.Add(layoutRendering);
 
                 foreach (var sublayout in layoutReplacement.Sublayouts)
                 {
-                    var rendering = renderingBuilder.GetRenederingById(sublayout.SublayoutId);
+                    var rendering = renderingBuilder.GetRenderingById(sublayout.SublayoutId);
                     if (rendering != null)
                         pageDefinition.Renderings.Add(rendering);
                 }
@@ -64,7 +64,7 @@ namespace Aqueduct.Toggles.Sitecore
                 var rendering = renderings[i];
                 if (rendering.RenderingItem.ID.Guid == replacement.Original)
                 {
-                    var newRendering = renderingBuilder.GetRenederingById(replacement.New);
+                    var newRendering = renderingBuilder.GetRenderingById(replacement.New);
                     newRendering.Placeholder = rendering.Placeholder;
                     newRendering.DeviceId = rendering.DeviceId;
                     newRendering.LayoutId = rendering.LayoutId;
@@ -78,7 +78,7 @@ namespace Aqueduct.Toggles.Sitecore
 
         private class RenderingBuilder : XmlBasedRenderingParser
         {
-            public Rendering GetRenederingById(Guid id)
+            public Rendering GetRenderingById(Guid id)
             {
                 var rendering = new Rendering() {RenderingItemPath = id.ToString()};
                 rendering.UniqueId = Guid.NewGuid();
