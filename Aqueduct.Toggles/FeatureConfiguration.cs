@@ -1,36 +1,38 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using Aqueduct.Toggles.Configuration;
-using Aqueduct.Toggles.Overrides;
 
 namespace Aqueduct.Toggles
 {
-    internal class FeatureConfiguration
+    public class FeatureConfiguration
     {
+        internal static readonly FeatureToggleConfigurationSection FeatureToggleConfiguration = ConfigurationManager.GetSection("featureToggles") as FeatureToggleConfigurationSection;
+
         private IList<Feature> _features = new List<Feature>();
-        internal IOverrideProvider Provider;
 
-        internal void LoadFromConfiguration(FeatureToggleConfigurationSection config)
+        public FeatureConfiguration()
         {
-            _features = config.Features.Cast<FeatureToggleConfigurationElement>().Select(Feature.FromConfig).ToList();
+            if (FeatureToggleConfiguration == null) throw new ConfigurationErrorsException("Missing featureToggles section in config.");
+            LoadFromConfiguration();
         }
 
-        internal void SetOverrideProvider(IOverrideProvider provider)
+        protected void LoadFromConfiguration()
         {
-            Provider = provider;
+            _features = FeatureToggleConfiguration.Features.Cast<FeatureToggleConfigurationElement>().Select(Feature.FromConfig).ToList();
         }
-        
+
+        public FeatureToggleConfigurationSection FeatureToggleConfigurationSection => FeatureToggleConfiguration;
+
         public IEnumerable<Feature> AllFeatures => _features;
 
         public IEnumerable<Feature> EnabledFeatures => _features.Where(IsEnabled);
 
         public bool IsEnabled(string name)
         {
-            var overrides = Provider.GetOverrides();
-            if (overrides.ContainsKey(name)) return overrides[name];
-
-            return IsEnabled(GetFeature(name));
+            return
+            IsEnabled(GetFeature(name));
         }
 
         public bool IsEnabled(Feature feature)
@@ -38,8 +40,7 @@ namespace Aqueduct.Toggles
             if (feature == null)
                 return false;
 
-            var overrides = Provider.GetOverrides();
-            return overrides.ContainsKey(feature.Name) ? overrides[feature.Name] : feature.Enabled;
+            return feature.Enabled;
         }
 
         public Feature GetFeature(string name)

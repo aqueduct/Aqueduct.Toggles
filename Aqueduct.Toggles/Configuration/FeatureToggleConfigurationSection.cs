@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Aqueduct.Toggles.Configuration
 {
-    internal class FeatureToggleConfigurationSection : ConfigurationSection
+    public class FeatureToggleConfigurationSection : ConfigurationSection
     {
         public static Func<FeatureToggleConfigurationSection> Settings = () => settings;
 
@@ -15,6 +15,15 @@ namespace Aqueduct.Toggles.Configuration
         
         [ConfigurationProperty("encryption")]
         public EncryptionConfigurationElement EncryptionElement => (EncryptionConfigurationElement)this["encryption"];
+
+        [ConfigurationProperty("enableSitecoreOverrides", DefaultValue = false)]
+        public bool EnableSitecoreOverrides => (bool) base["enableSitecoreOverrides"];
+
+        [ConfigurationProperty("sitecoreOverridesPath")]
+        public string SitecoreOverridesPath => (string) base["sitecoreOverridesPath"];
+
+        [ConfigurationProperty("sitecoreFeatureDatabaseDefault")]
+        public string SitecoreFeatureDatabaseDefault => (string) base["sitecoreFeatureDatabaseDefault"];
 
         public IEncryptionConfiguration Encryption => EncryptionElement;
     }

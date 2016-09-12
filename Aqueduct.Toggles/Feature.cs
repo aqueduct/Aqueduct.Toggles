@@ -4,6 +4,7 @@ using System.Linq;
 using Aqueduct.Toggles.Configuration;
 using Aqueduct.Toggles.Configuration.Layouts;
 using Aqueduct.Toggles.Configuration.Renderings;
+using Aqueduct.Toggles.Overrides;
 
 namespace Aqueduct.Toggles
 {
@@ -11,6 +12,7 @@ namespace Aqueduct.Toggles
     {
         public string Name { get; set; }
         public bool Enabled { get; set; }
+        public bool DefaultEnabled { get; set; }
         public string ShortDescription { get; set; }
         public string Requirements { get; set; }
         public string IssueTrackingReference { get; set; }
@@ -26,6 +28,8 @@ namespace Aqueduct.Toggles
                 UpdateLanguagesList(value);
             }
         }
+
+        public string OverrideProviderName { get; set; }
 
         private void UpdateLanguagesList(string value)
         {
@@ -48,7 +52,7 @@ namespace Aqueduct.Toggles
         public IList<LayoutToggle> Items { get; private set; }
 
         public IList<RenderingToggle> Renderings { get; private set; }
-
+        
         public Feature()
         {
             Templates = new List<LayoutToggle>();
@@ -65,7 +69,8 @@ namespace Aqueduct.Toggles
                           {
                               Enabled = element.Enabled,
                               Languages = element.Languages,
-                              Name = element.Name
+                              Name = element.Name,
+                              DefaultEnabled = element.Enabled
                           };
             if (element.Help != null)
             {

@@ -5,10 +5,12 @@ using Aqueduct.Toggles.Helpers;
 
 namespace Aqueduct.Toggles.Overrides
 {
-    internal class CookieOverrideProvider : IOverrideProvider
+    public class CookieOverrideProvider : IOverrideProvider
     {
         private readonly HttpContextBase _context;
         internal const string CookieName = "Aqueduct.Toggles";
+
+        public string Name => "CookieProvider";
 
         public CookieOverrideProvider(HttpContextBase context)
         {
@@ -66,7 +68,7 @@ namespace Aqueduct.Toggles.Overrides
         {
             var context = GetCurrentContext();
 
-            var cookie = new HttpCookie(CookieName, overrides.Serialize().Encrypt()) {HttpOnly = true};
+            var cookie = new HttpCookie(CookieName, overrides.Serialize().Encrypt()) { HttpOnly = true };
             context.Response.Cookies.Add(cookie);
         }
     }

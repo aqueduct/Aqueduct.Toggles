@@ -19,9 +19,9 @@ namespace Aqueduct.Toggles.Tests
             var provider = Substitute.For<IOverrideProvider>();
             FeatureToggles.SetOverrideProvider(provider);
 
-            var overrides = FeatureToggles.GetOverrideProvider();
+            var overrides = FeatureToggles.GetOverrideProviders();
 
-            overrides.Should().Be(provider);
+            overrides.Should().Contain(provider);
         }
 
         [TearDown]

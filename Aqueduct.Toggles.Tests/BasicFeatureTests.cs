@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using Aqueduct.Toggles.Overrides;
 using Moq;
+using NSubstitute;
 using NUnit.Framework;
 
 namespace Aqueduct.Toggles.Tests
@@ -24,6 +26,7 @@ namespace Aqueduct.Toggles.Tests
         private static void SetupOverrides(Dictionary<string, bool> dictionary)
         {
             var overrides = new Mock<IOverrideProvider>();
+            overrides.Setup(x => x.Name).Returns("MockProvider");
             overrides.Setup(x => x.GetOverrides()).Returns(dictionary);
             FeatureToggles.SetOverrideProvider(overrides.Object);
         }
@@ -42,7 +45,9 @@ namespace Aqueduct.Toggles.Tests
         [Test]
         public void GetsCssClassStringCorrectly()
         {
-            Assert.AreEqual("feat-featureenabled feat-featuredisabledbutoverridden feat-featurewithsublayouts feat-enabledforcurrentlanguage feat-featurewithlayoutbytemplateid feat-featurewithlayoutbyitemid feat-featurewithlayoutdefault feat-featurewithmultiplelayouts", FeatureToggles.GetCssClassesForFeatures("current"));
+            var featuresForClass = FeatureToggles.GetCssClassesForFeatures("current");
+            Assert.IsTrue(featuresForClass.Contains("no-feat-enabledbutwronglanguage"));
+            Assert.IsTrue(featuresForClass.Contains("feat-enabledforcurrentlanguage"));
         }
 
         [Test]
@@ -86,16 +91,16 @@ namespace Aqueduct.Toggles.Tests
         [Test]
         public void GetAllFeatures_GivenFeatureEnabledConfigButOverriddenByTheUser_ReturnsDisabledFeature()
         {
-            SetupOverrides(new Dictionary<string, bool> { { "featureenabled", false } });
+            SetupOverrides(new Dictionary<string, bool> { { "featureenabledTest", false } });
 
-            var enabled = FeatureToggles.IsEnabled("featureenabled");
+            var enabled = FeatureToggles.IsEnabled("featureenabledTest");
             Assert.False(enabled);
         }
 
         [TearDown]
         public void TearDown()
         {
-            FeatureToggles.SetOverrideProvider(new CookieOverrideProvider());
+
         }
     }
 }

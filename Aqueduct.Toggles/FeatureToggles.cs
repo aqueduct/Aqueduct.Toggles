@@ -1,51 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Aqueduct.Toggles.Configuration;
+using System.Security.Cryptography;
 using Aqueduct.Toggles.Overrides;
 
 namespace Aqueduct.Toggles
 {
     public static class FeatureToggles
     {
-        private static readonly FeatureToggleConfigurationSection FeatureToggleConfiguration = ConfigurationManager.GetSection("featureToggles") as FeatureToggleConfigurationSection;
-        internal static readonly FeatureConfiguration Configuration = new FeatureConfiguration();
+        internal static List<IOverrideProvider> Providers = new List<IOverrideProvider>();
 
-        static FeatureToggles()
-        {
-            if (FeatureToggleConfiguration == null) throw new ConfigurationErrorsException("Missing featureToggles section in config.");
-
-            Configuration.LoadFromConfiguration(FeatureToggleConfiguration);
-            SetOverrideProvider(new CookieOverrideProvider());
-        }
+        public static readonly FeatureConfiguration Configuration = new FeatureConfiguration();
 
         public static void SetOverrideProvider(IOverrideProvider provider)
         {
-            Configuration.SetOverrideProvider(provider);
+            Providers.Add(provider);
         }
 
-        public static IOverrideProvider GetOverrideProvider()
+        public static void ResetProviders()
         {
-            return Configuration.Provider;
+            Providers.Clear();
+        }
+
+        public static IEnumerable<IOverrideProvider> GetOverrideProviders()
+        {
+            return Providers.ToList();
         }
 
         public static bool IsEnabled(string name)
         {
-            return Configuration.IsEnabled(name);
+            return GetFeatureFlagFromOverrideProviders(name)?[name] ?? Configuration.IsEnabled(name);
         }
 
         public static string GetCssClassesForFeatures(string currentLanguage)
         {
-            var enabled = Configuration.EnabledFeatures.Where(x => x.EnabledForLanguage(currentLanguage))
-                                                    .Select(x => $"feat-{x.Name}")
+            var enabled = Configuration.EnabledFeatures.Select(x =>
+            {
+                var featureEnabled = x.EnabledForLanguage(currentLanguage);
+                return featureEnabled ? $"feat-{x.Name}" : $"no-feat-{x.Name}";
+            })
                                                     .ToArray();
             return string.Join(" ", enabled);
         }
 
         public static IEnumerable<Feature> GetAllFeatures()
         {
-            return Configuration.AllFeatures.ToList();
+            var features = Configuration.AllFeatures.ToList();
+            features.ForEach(ApplyOverrides);
+            return features;
         }
 
         public static IEnumerable<Feature> GetAllEnabledFeatures()
@@ -53,5 +54,40 @@ namespace Aqueduct.Toggles
             return GetAllFeatures().Where(x => IsEnabled(x.Name));
         }
 
+        private static Dictionary<string, bool> GetFeatureFlagFromOverrideProviders(string name)
+        {
+            //return first matching provider that has the key
+            foreach (var provider in Providers)
+            {
+                var overrides = provider.GetOverrides();
+                if (overrides?.ContainsKey(name) ?? false)
+                {
+                    var feature = Configuration.GetFeature(name);
+                    if (feature != null)
+                    {
+                        feature.OverrideProviderName = provider.Name;
+                    }
+                    return new Dictionary<string, bool> { { name, overrides[name] } };
+                }
+            }
+            return null;
+        }
+
+        private static void ApplyOverrides(Feature feature)
+        {
+            feature.Enabled = feature.DefaultEnabled;
+            feature.OverrideProviderName = "Config File";
+            //return first matching provider that has the key
+            foreach (var provider in Providers)
+            {
+                var overrides = provider.GetOverrides();
+                if (overrides?.ContainsKey(feature.Name) ?? false)
+                {
+                    feature.OverrideProviderName = provider.Name;
+                    feature.Enabled = overrides[feature.Name];
+                    return;
+                }
+            }
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace Aqueduct.Toggles.Tests.Overrides
         {
             _context = Substitute.For<HttpContextBase>();
             _provider = new CookieOverrideProvider(_context);
-            _validOverrides = new Dictionary<string, bool> {{"test", true}};
+            _validOverrides = new Dictionary<string, bool> { { "test", true } };
         }
 
         [Test]

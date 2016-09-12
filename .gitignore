@@ -64,3 +64,4 @@ build/prepare
 /lib/Sitecore.Kernel.dll
 
 lib/Sitecore.Mvc.dll
+lib/Sitecore.Kernel.xml
