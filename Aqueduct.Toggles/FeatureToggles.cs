@@ -33,7 +33,7 @@ namespace Aqueduct.Toggles
 
         public static string GetCssClassesForFeatures(string currentLanguage)
         {
-            var enabled = Configuration.EnabledFeatures.Select(x =>
+            var enabled = GetAllEnabledFeatures().Select(x =>
             {
                 var featureEnabled = x.EnabledForLanguage(currentLanguage);
                 return featureEnabled ? $"feat-{x.Name}" : $"no-feat-{x.Name}";
