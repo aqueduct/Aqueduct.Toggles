@@ -31,9 +31,9 @@ namespace Aqueduct.Toggles
             return GetFeatureFlagFromOverrideProviders(name)?[name] ?? Configuration.IsEnabled(name);
         }
 
-        public static string GetCssClassesForFeatures(string currentLanguage)
+        public static string GetCssClassesForFeatures(string currentLanguage = null)
         {
-            var enabled = GetAllEnabledFeatures().Select(x =>
+            var enabled = GetAllFeatures().Select(x =>
             {
                 var featureEnabled = x.EnabledForLanguage(currentLanguage);
                 return featureEnabled ? $"feat-{x.Name}" : $"no-feat-{x.Name}";

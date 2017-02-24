@@ -43,11 +43,23 @@ namespace Aqueduct.Toggles.Tests
         }
 
         [Test]
-        public void GetsCssClassStringCorrectly()
+        public void GetCssClassesForFeatures_GivenLanguage_ReturnsCorrectString()
         {
             var featuresForClass = FeatureToggles.GetCssClassesForFeatures("current");
-            Assert.IsTrue(featuresForClass.Contains("no-feat-enabledbutwronglanguage"));
-            Assert.IsTrue(featuresForClass.Contains("feat-enabledforcurrentlanguage"));
+            Assert.IsTrue(featuresForClass.Contains(" no-feat-enabledbutwronglanguage"));
+            Assert.IsTrue(featuresForClass.Contains(" feat-enabledforcurrentlanguage"));
+            Assert.IsTrue(featuresForClass.Contains(" no-feat-featuredisabled"));
+            Assert.IsTrue(featuresForClass.Contains("feat-featureenabled"));
+        }
+
+        [Test]
+        public void GetCssClassesForFeatures_GivenNoLanguage_ReturnsCorrectString()
+        {
+            var featuresForClass = FeatureToggles.GetCssClassesForFeatures();
+            Assert.IsTrue(featuresForClass.Contains(" feat-enabledbutwronglanguage"));
+            Assert.IsTrue(featuresForClass.Contains(" feat-enabledforcurrentlanguage"));
+            Assert.IsTrue(featuresForClass.Contains(" no-feat-featuredisabled"));
+            Assert.IsTrue(featuresForClass.Contains("feat-featureenabled"));
         }
 
         [Test]

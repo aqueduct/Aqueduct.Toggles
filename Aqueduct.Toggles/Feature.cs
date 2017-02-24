@@ -43,9 +43,9 @@ namespace Aqueduct.Toggles
         public bool EnabledForLanguage(string language)
         {
             if (string.IsNullOrWhiteSpace(language))
-                return false;
+                return Enabled;
 
-            return LanguagesList.Count == 0 || LanguagesList.Contains(language.ToLower());
+            return Enabled && (LanguagesList.Count == 0 || LanguagesList.Contains(language.ToLower()));
         }
 
         public IList<LayoutToggle> Templates { get; private set; }
